@@ -3,49 +3,813 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebXperience Challenge</title>
-    
-    <!-- Google Fonts: Inter & Outfit -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- GSAP (GreenSock) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    
-    <!-- Lenis (Smooth Scroll) -->
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <title>AirSound Pro - 3D Experience</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #f5f5f7;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent: #0071e3;
+        }
+
+        html {
+            scroll-behavior: auto;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Canvas Container - Fixed and Full Screen */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+            background: radial-gradient(circle at center, #e8e8ed 0%, #f5f5f7 100%);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Scroll Track - Creates scrollable height */
+        #scroll-track {
+            position: relative;
+            z-index: 2;
+            height: 600vh; /* Long scroll track for animation */
+        }
+
+        /* Content Sections - Overlaid on canvas */
+        .content-section {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .content-wrapper {
+            max-width: 600px;
+            padding: 0 40px;
+            text-align: center;
+            pointer-events: auto;
+        }
+
+        .section-1 { top: 0; }
+        .section-2 { top: 150vh; }
+        .section-3 { top: 300vh; }
+        .section-4 { top: 450vh; }
+
+        /* Typography */
+        .headline {
+            font-size: clamp(48px, 8vw, 96px);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .subhead {
+            font-size: clamp(21px, 3vw, 32px);
+            font-weight: 400;
+            line-height: 1.4;
+            color: var(--text-secondary);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .feature-title {
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 600;
+            margin-bottom: 16px;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .feature-desc {
+            font-size: clamp(18px, 2vw, 24px);
+            line-height: 1.5;
+            color: var(--text-secondary);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        /* Loading Screen */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 4px;
+            background: #d2d2d7;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--text-primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Final CTA Section */
+        #final-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(to top, rgba(245,245,247,1) 0%, rgba(245,245,247,0.95) 50%, rgba(245,245,247,0) 100%);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 100px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #final-section.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .final-content {
+            text-align: center;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #final-section.visible .final-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .final-headline {
+            font-size: clamp(40px, 6vw, 72px);
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .final-subhead {
+            font-size: clamp(20px, 2.5vw, 28px);
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .price {
+            font-size: 21px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 18px 40px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 980px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: transform 0.3s ease, background 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            background: #0077ed;
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            opacity: 1;
+            transition: opacity 0.5s;
+            z-index: 30;
+        }
+
+        .scroll-arrow {
+            width: 24px;
+            height: 24px;
+            border-right: 2px solid var(--text-secondary);
+            border-bottom: 2px solid var(--text-secondary);
+            transform: rotate(45deg);
+            margin-top: 8px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(45deg); }
+            40% { transform: translateY(-10px) rotate(45deg); }
+            60% { transform: translateY(-5px) rotate(45deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 0 24px;
+            }
+            
+            #final-section {
+                padding-bottom: 60px;
+            }
+        }
+
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
 </head>
 <body>
 
-    <main class="app-container">
-        <!-- Hackathon Content Goes Here -->
-        <header>
-            <nav class="navbar">
-                <div class="logo">WebXperience</div>
-                <div class="menu">
-                    <a href="#">Home</a>
-                    <a href="#">About</a>
-                    <a href="#">Work</a>
-                </div>
-            </nav>
-        </header>
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-text">AirSound Pro</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+    </div>
 
-        <section class="hero">
-            <h1 class="hero-title">Create. Build. <span class="highlight">Animate.</span></h1>
-            <p class="hero-subtitle">Ready for the challenge.</p>
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container">
+        <canvas id="hero-canvas"></canvas>
+    </div>
+
+    <!-- Scroll Track for triggering animations -->
+    <div id="scroll-track">
+        
+        <!-- Section 1: Hero -->
+        <section class="content-section section-1" id="sec1">
+            <div class="content-wrapper">
+                <h1 class="headline">AirSound Pro</h1>
+                <p class="subhead">Sound reimagined.</p>
+            </div>
+            <div class="scroll-indicator" id="scrollHint">
+                <span>Scroll to explore</span>
+                <div class="scroll-arrow"></div>
+            </div>
         </section>
 
-        <!-- Placeholder for prompt-specific content -->
-        <div id="content-area"></div>
-        
-    </main>
+        <!-- Section 2: Spatial Audio -->
+        <section class="content-section section-2" id="sec2">
+            <div class="content-wrapper">
+                <h2 class="feature-title">Spatial Audio</h2>
+                <p class="feature-desc">Immersive sound that surrounds you. Dynamic head tracking places audio all around, creating a theater-like experience.</p>
+            </div>
+        </section>
 
-    <!-- JS -->
-    <script src="script.js"></script>
+        <!-- Section 3: Noise Cancellation -->
+        <section class="content-section section-3" id="sec3">
+            <div class="content-wrapper">
+                <h2 class="feature-title">Active Noise Cancellation</h2>
+                <p class="feature-desc">World-class noise cancellation eliminates background noise. Transparency mode lets you hear what you want to hear.</p>
+            </div>
+        </section>
+
+        <!-- Section 4: Battery -->
+        <section class="content-section section-4" id="sec4">
+            <div class="content-wrapper">
+                <h2 class="feature-title">All-Day Battery</h2>
+                <p class="feature-desc">Up to 30 hours of listening time. A 5-minute charge gives you 1 hour of playback.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Final CTA Section -->
+    <div id="final-section">
+        <div class="final-content">
+            <h2 class="final-headline">AirSound Pro</h2>
+            <p class="final-subhead">Available now.</p>
+            <p class="price">Starting at $249 or $41.50/month for 6 months.</p>
+            <button class="cta-button" onclick="alert('Coming soon!')">Buy Now</button>
+        </div>
+    </div>
+
+    <script>
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Configuration
+        const FRAME_COUNT = 120; // Total frames in sequence
+        const IMAGE_FORMAT = 'webp'; // Use webp for better compression
+        const IMAGE_PATH = 'https://www.apple.com/105/media/us/airpods-pro/2019/1299e2f5_9206_4470_b28e_08307a42f19b/anim/sequence/large/01-hero-lightpass/'; // Using Apple's public asset structure as example
+        
+        // Canvas setup
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+        
+        // State
+        let images = [];
+        let currentFrame = 0;
+        let isLoading = true;
+        let loadedCount = 0;
+        
+        // Set canvas size
+        function resizeCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            
+            ctx.scale(dpr, dpr);
+            canvas.style.width = `${rect.width}px`;
+            canvas.style.height = `${rect.height}px`;
+            
+            // Redraw current frame if available
+            if (images[currentFrame] && images[currentFrame].complete) {
+                drawFrame(currentFrame);
+            }
+        }
+
+        // Draw specific frame
+        function drawFrame(index) {
+            if (!images[index] || !images[index].complete) return;
+            
+            const img = images[index];
+            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
+            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Calculate cover fit
+            const scale = Math.max(canvasWidth / img.width, canvasHeight / img.height);
+            const x = (canvasWidth - img.width * scale) / 2;
+            const y = (canvasHeight - img.height * scale) / 2;
+            
+            // Draw image with smooth rendering
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        }
+
+        // Generate image URLs (simulating 3D rendered sequence)
+        // In production, these would be actual rendered frames from 3D software
+        function getImageUrl(index) {
+            // Pad index to 4 digits (0001, 0002, etc.)
+            const frameNum = (index + 1).toString().padStart(4, '0');
+            return `${IMAGE_PATH}${frameNum}.jpg`;
+        }
+
+        // Preload images with progress tracking
+        async function preloadImages() {
+            const promises = [];
+            
+            // Load images in chunks for better performance
+            const chunkSize = 10;
+            
+            for (let i = 0; i < FRAME_COUNT; i++) {
+                const promise = new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    
+                    img.onload = () => {
+                        loadedCount++;
+                        updateLoader();
+                        resolve(img);
+                    };
+                    
+                    img.onerror = () => {
+                        // If image fails to load, create a placeholder
+                        console.warn(`Failed to load frame ${i}`);
+                        loadedCount++;
+                        updateLoader();
+                        resolve(createPlaceholderFrame(i));
+                    };
+                    
+                    // Try to load actual image, fallback to generated canvas
+                    img.src = getImageUrl(i);
+                });
+                
+                promises.push(promise);
+                
+                // Process in chunks to not block UI
+                if (i % chunkSize === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                }
+            }
+            
+            images = await Promise.all(promises);
+            isLoading = false;
+            hideLoader();
+            initScrollAnimation();
+        }
+
+        // Create placeholder frame if image fails (for demo purposes)
+        function createPlaceholderFrame(frameIndex) {
+            const placeholderCanvas = document.createElement('canvas');
+            placeholderCanvas.width = 1920;
+            placeholderCanvas.height = 1080;
+            const pCtx = placeholderCanvas.getContext('2d');
+            
+            // Create gradient background simulating 3D rotation
+            const rotation = (frameIndex / FRAME_COUNT) * Math.PI * 2;
+            const hue = 200 + Math.sin(rotation) * 20;
+            
+            const gradient = pCtx.createRadialGradient(
+                960 + Math.cos(rotation) * 200, 
+                540 + Math.sin(rotation) * 100, 
+                0,
+                960, 540, 1000
+            );
+            
+            gradient.addColorStop(0, `hsl(${hue}, 10%, 95%)`);
+            gradient.addColorStop(0.5, `hsl(${hue}, 5%, 90%)`);
+            gradient.addColorStop(1, `hsl(${hue}, 10%, 85%)`);
+            
+            pCtx.fillStyle = gradient;
+            pCtx.fillRect(0, 0, 1920, 1080);
+            
+            // Draw simplified AirPods representation
+            pCtx.save();
+            pCtx.translate(960, 540);
+            pCtx.rotate(rotation);
+            pCtx.scale(0.8 + Math.sin(rotation * 2) * 0.2, 0.8 + Math.sin(rotation * 2) * 0.2);
+            
+            // Case
+            pCtx.fillStyle = '#f5f5f7';
+            pCtx.shadowColor = 'rgba(0,0,0,0.2)';
+            pCtx.shadowBlur = 60;
+            pCtx.shadowOffsetY = 40;
+            
+            // Draw case with rounded rect
+            pCtx.beginPath();
+            pCtx.roundRect(-150, -200, 300, 400, 60);
+            pCtx.fill();
+            
+            // Lid (opens based on frame)
+            const openAmount = Math.max(0, (frameIndex - 30) / 60);
+            pCtx.save();
+            pCtx.translate(0, -200);
+            pCtx.rotate(-openAmount * Math.PI / 3);
+            pCtx.translate(0, 200);
+            
+            pCtx.fillStyle = '#e8e8ed';
+            pCtx.beginPath();
+            pCtx.roundRect(-150, -200, 300, 200, [60, 60, 0, 0]);
+            pCtx.fill();
+            pCtx.restore();
+            
+            // Earbuds (appear after lid opens)
+            if (frameIndex > 40) {
+                const earbudY = -50 - Math.min((frameIndex - 40) * 3, 100);
+                
+                // Left earbud
+                pCtx.fillStyle = '#ffffff';
+                pCtx.shadowBlur = 30;
+                pCtx.beginPath();
+                pCtx.ellipse(-80, earbudY, 40, 80, -0.2, 0, Math.PI * 2);
+                pCtx.fill();
+                
+                // Right earbud
+                pCtx.beginPath();
+                pCtx.ellipse(80, earbudY, 40, 80, 0.2, 0, Math.PI * 2);
+                pCtx.fill();
+            }
+            
+            pCtx.restore();
+            
+            const img = new Image();
+            img.src = placeholderCanvas.toDataURL();
+            return img;
+        }
+
+        // Update loading progress
+        function updateLoader() {
+            const percent = Math.round((loadedCount / FRAME_COUNT) * 100);
+            document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('progressText').textContent = `${percent}%`;
+        }
+
+        // Hide loader
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+                // Show initial content
+                animateIn(document.querySelector('#sec1 .headline'));
+                animateIn(document.querySelector('#sec1 .subhead'), 0.2);
+            }, 500);
+        }
+
+        // Helper to animate elements in
+        function animateIn(element, delay = 0) {
+            gsap.to(element, {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                delay: delay,
+                ease: "power3.out"
+            });
+        }
+
+        // Main scroll animation setup
+        function initScrollAnimation() {
+            // Create GSAP timeline tied to scroll
+            const scrollTimeline = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#scroll-track",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 0.5, // Smooth scrubbing
+                    pin: false,
+                    onUpdate: (self) => {
+                        // Calculate frame based on scroll progress
+                        const progress = self.progress;
+                        const frameIndex = Math.min(
+                            Math.floor(progress * (FRAME_COUNT - 1)),
+                            FRAME_COUNT - 1
+                        );
+                        
+                        if (frameIndex !== currentFrame) {
+                            currentFrame = frameIndex;
+                            requestAnimationFrame(() => drawFrame(currentFrame));
+                        }
+                        
+                        // Show final section at end
+                        if (progress > 0.9) {
+                            document.getElementById('final-section').classList.add('visible');
+                        } else {
+                            document.getElementById('final-section').classList.remove('visible');
+                        }
+                    }
+                }
+            });
+
+            // Content section animations
+            setupContentAnimations();
+        }
+
+        // Setup content reveal animations
+        function setupContentAnimations() {
+            // Section 1: Hero fade out
+            gsap.to("#sec1 .headline", {
+                scrollTrigger: {
+                    trigger: "#sec1",
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                },
+                opacity: 0,
+                y: -100,
+                ease: "none"
+            });
+            
+            gsap.to("#sec1 .subhead", {
+                scrollTrigger: {
+                    trigger: "#sec1",
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                },
+                opacity: 0,
+                y: -50,
+                ease: "none"
+            });
+            
+            gsap.to("#scrollHint", {
+                scrollTrigger: {
+                    trigger: "#sec1",
+                    start: "10% top",
+                    end: "50% top",
+                    scrub: true
+                },
+                opacity: 0,
+                ease: "none"
+            });
+
+            // Section 2: Spatial Audio
+            gsap.to("#sec2", {
+                scrollTrigger: {
+                    trigger: "#sec2",
+                    start: "top 80%",
+                    end: "top 30%",
+                    scrub: true
+                },
+                opacity: 1,
+                ease: "none"
+            });
+            
+            gsap.to("#sec2 .feature-title", {
+                scrollTrigger: {
+                    trigger: "#sec2",
+                    start: "top 70%",
+                    end: "top 40%",
+                    scrub: true
+                },
+                opacity: 1,
+                y: 0,
+                ease: "none"
+            });
+            
+            gsap.to("#sec2 .feature-desc", {
+                scrollTrigger: {
+                    trigger: "#sec2",
+                    start: "top 60%",
+                    end: "top 30%",
+                    scrub: true
+                },
+                opacity: 1,
+                y: 0,
+                ease: "none"
+            });
+            
+            // Fade out section 2
+            gsap.to("#sec2", {
+                scrollTrigger: {
+                    trigger: "#sec2",
+                    start: "bottom 80%",
+                    end: "bottom top",
+                    scrub: true
+                },
+                opacity: 0,
+                ease: "none"
+            });
+
+            // Section 3: Noise Cancellation
+            gsap.to("#sec3", {
+                scrollTrigger: {
+                    trigger: "#sec3",
+                    start: "top 80%",
+                    end: "top 30%",
+                    scrub: true
+                },
+                opacity: 1,
+                ease: "none"
+            });
+            
+            gsap.to("#sec3 .feature-title", {
+                scrollTrigger: {
+                    trigger: "#sec3",
+                    start: "top 70%",
+                    end: "top 40%",
+                    scrub: true
+                },
+                opacity: 1,
+                y: 0,
+                ease: "none"
+            });
+            
+            gsap.to("#sec3 .feature-desc", {
+                scrollTrigger: {
+                    trigger: "#sec3",
+                    start: "top 60%",
+                    end: "top 30%",
+                    scrub: true
+                },
+                opacity: 1,
+                y: 0,
+                ease: "none"
+            });
+            
+            gsap.to("#sec3", {
+                scrollTrigger: {
+                    trigger: "#sec3",
+                    start: "bottom 80%",
+                    end: "bottom top",
+                    scrub: true
+                },
+                opacity: 0,
+                ease: "none"
+            });
+
+            // Section 4: Battery
+            gsap.to("#sec4", {
+                scrollTrigger: {
+                    trigger: "#sec4",
+                    start: "top 80%",
+                    end: "top 30%",
+                    scrub: true
+                },
+                opacity: 1,
+                ease: "none"
+            });
+            
+            gsap.to("#sec4 .feature-title", {
+                scrollTrigger: {
+                    trigger: "#sec4",
+                    start: "top 70%",
+                    end: "top 40%",
+                    scrub: true
+                },
+                opacity: 1,
+                y: 0,
+                ease: "none"
+            });
+            
+            gsap.to("#sec4 .feature-desc", {
+                scrollTrigger: {
+                    trigger: "#sec4",
+                    start: "top 60%",
+                    end: "top 30%",
+                    scrub: true
+                },
+                opacity: 1,
+                y: 0,
+                ease: "none"
+            });
+            
+            gsap.to("#sec4", {
+                scrollTrigger: {
+                    trigger: "#sec4",
+                    start: "bottom 80%",
+                    end: "bottom top",
+                    scrub: true
+                },
+                opacity: 0,
+                ease: "none"
+            });
+        }
+
+        // Initialize
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            preloadImages();
+        });
+
+        // Initial resize
+        resizeCanvas();
+
+        // Smooth scroll behavior for any anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

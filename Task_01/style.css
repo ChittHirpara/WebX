@@ -625,7 +625,16 @@ body:hover .cur {
 
     .pop__img {
         max-width: 92vw;
+        max-height: 70vh;
+        /* Reduce height constraint on mobile */
         border-radius: 12px;
+    }
+
+    .pop__x {
+        top: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
     }
 }
 
