@@ -1,815 +1,266 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="lenis lenis-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AirSound Pro - 3D Experience</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <title>Scroll Animations | WebX Task 03</title>
+    <link rel="stylesheet" href="style.css">
 
-        :root {
-            --bg-color: #f5f5f7;
-            --text-primary: #1d1d1f;
-            --text-secondary: #86868b;
-            --accent: #0071e3;
-        }
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
-        html {
-            scroll-behavior: auto;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            overflow-x: hidden;
-        }
-
-        /* Canvas Container - Fixed and Full Screen */
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 1;
-            background: radial-gradient(circle at center, #e8e8ed 0%, #f5f5f7 100%);
-        }
-
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* Scroll Track - Creates scrollable height */
-        #scroll-track {
-            position: relative;
-            z-index: 2;
-            height: 600vh; /* Long scroll track for animation */
-        }
-
-        /* Content Sections - Overlaid on canvas */
-        .content-section {
-            position: absolute;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            opacity: 0;
-            z-index: 10;
-        }
-
-        .content-wrapper {
-            max-width: 600px;
-            padding: 0 40px;
-            text-align: center;
-            pointer-events: auto;
-        }
-
-        .section-1 { top: 0; }
-        .section-2 { top: 150vh; }
-        .section-3 { top: 300vh; }
-        .section-4 { top: 450vh; }
-
-        /* Typography */
-        .headline {
-            font-size: clamp(48px, 8vw, 96px);
-            font-weight: 700;
-            line-height: 1.05;
-            letter-spacing: -0.02em;
-            margin-bottom: 20px;
-            opacity: 0;
-            transform: translateY(40px);
-        }
-
-        .subhead {
-            font-size: clamp(21px, 3vw, 32px);
-            font-weight: 400;
-            line-height: 1.4;
-            color: var(--text-secondary);
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        .feature-title {
-            font-size: clamp(32px, 5vw, 56px);
-            font-weight: 600;
-            margin-bottom: 16px;
-            opacity: 0;
-            transform: translateY(40px);
-        }
-
-        .feature-desc {
-            font-size: clamp(18px, 2vw, 24px);
-            line-height: 1.5;
-            color: var(--text-secondary);
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        /* Loading Screen */
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-color);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
-        }
-
-        .loader-text {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-        }
-
-        .progress-bar {
-            width: 200px;
-            height: 4px;
-            background: #d2d2d7;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--text-primary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            margin-top: 12px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        /* Final CTA Section */
-        #final-section {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(to top, rgba(245,245,247,1) 0%, rgba(245,245,247,0.95) 50%, rgba(245,245,247,0) 100%);
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            padding-bottom: 100px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-
-        #final-section.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .final-content {
-            text-align: center;
-            transform: translateY(50px);
-            opacity: 0;
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        #final-section.visible .final-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .final-headline {
-            font-size: clamp(40px, 6vw, 72px);
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .final-subhead {
-            font-size: clamp(20px, 2.5vw, 28px);
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-
-        .price {
-            font-size: 21px;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 18px 40px;
-            background: var(--accent);
-            color: white;
-            text-decoration: none;
-            border-radius: 980px;
-            font-size: 18px;
-            font-weight: 600;
-            transition: transform 0.3s ease, background 0.3s ease;
-            cursor: pointer;
-            border: none;
-        }
-
-        .cta-button:hover {
-            transform: scale(1.05);
-            background: #0077ed;
-        }
-
-        /* Scroll Indicator */
-        .scroll-indicator {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-secondary);
-            font-size: 14px;
-            opacity: 1;
-            transition: opacity 0.5s;
-            z-index: 30;
-        }
-
-        .scroll-arrow {
-            width: 24px;
-            height: 24px;
-            border-right: 2px solid var(--text-secondary);
-            border-bottom: 2px solid var(--text-secondary);
-            transform: rotate(45deg);
-            margin-top: 8px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(45deg); }
-            40% { transform: translateY(-10px) rotate(45deg); }
-            60% { transform: translateY(-5px) rotate(45deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .content-wrapper {
-                padding: 0 24px;
-            }
-            
-            #final-section {
-                padding-bottom: 60px;
-            }
-        }
-
-        /* Hide scrollbar for cleaner look */
-        ::-webkit-scrollbar {
-            width: 0px;
-            background: transparent;
-        }
-    </style>
+    <!-- GSAP + Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <!-- Lenis -->
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 </head>
+
 <body>
+    <!-- Particle Canvas (full-screen background) -->
+    <canvas id="particle-canvas"></canvas>
 
-    <!-- Loading Screen -->
-    <div id="loader">
-        <div class="loader-text">AirSound Pro</div>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
+    <!-- Mouse-follow glow -->
+    <div id="cursor-glow"></div>
+
+    <!-- ============================================================
+         SCENE 1: COSMIC HERO
+         ============================================================ -->
+    <section class="scene scene-hero" id="scene-hero">
+        <div class="scene-hero__sticky">
+            <div class="hero-content" id="hero-content">
+                <p class="hero-tag">WebX &middot; Task 03</p>
+                <h1 class="hero-title" id="hero-title">
+                    <span class="hero-line" id="hero-line-1">Development</span>
+                    <span class="hero-line" id="hero-line-2">Reimagined.</span>
+                </h1>
+                <p class="hero-sub" id="hero-sub">It's not just about writing code.<br>It's about building experiences.
+                </p>
+                <div class="hero-cta" id="hero-cta">
+                    <span class="hero-scroll-hint">Scroll to explore</span>
+                    <div class="hero-scroll-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 5v14M5 12l7 7 7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-bg-gradient"></div>
         </div>
-        <div class="progress-text" id="progressText">0%</div>
-    </div>
+    </section>
 
-    <!-- 3D Canvas Container -->
-    <div id="canvas-container">
-        <canvas id="hero-canvas"></canvas>
-    </div>
-
-    <!-- Scroll Track for triggering animations -->
-    <div id="scroll-track">
-        
-        <!-- Section 1: Hero -->
-        <section class="content-section section-1" id="sec1">
-            <div class="content-wrapper">
-                <h1 class="headline">AirSound Pro</h1>
-                <p class="subhead">Sound reimagined.</p>
+    <!-- ============================================================
+         SCENE 2: THE REVEAL (Main screen materializes)
+         ============================================================ -->
+    <section class="scene scene-reveal" id="scene-reveal">
+        <div class="scene-reveal__sticky">
+            <div class="reveal-frame" id="reveal-frame">
+                <img src="assets/main-screen.svg" alt="Main Interface" class="reveal-img" id="reveal-img">
+                <div class="reveal-glitch-overlay" id="reveal-glitch"></div>
+                <div class="reveal-scanline"></div>
             </div>
-            <div class="scroll-indicator" id="scrollHint">
-                <span>Scroll to explore</span>
-                <div class="scroll-arrow"></div>
-            </div>
-        </section>
-
-        <!-- Section 2: Spatial Audio -->
-        <section class="content-section section-2" id="sec2">
-            <div class="content-wrapper">
-                <h2 class="feature-title">Spatial Audio</h2>
-                <p class="feature-desc">Immersive sound that surrounds you. Dynamic head tracking places audio all around, creating a theater-like experience.</p>
-            </div>
-        </section>
-
-        <!-- Section 3: Noise Cancellation -->
-        <section class="content-section section-3" id="sec3">
-            <div class="content-wrapper">
-                <h2 class="feature-title">Active Noise Cancellation</h2>
-                <p class="feature-desc">World-class noise cancellation eliminates background noise. Transparency mode lets you hear what you want to hear.</p>
-            </div>
-        </section>
-
-        <!-- Section 4: Battery -->
-        <section class="content-section section-4" id="sec4">
-            <div class="content-wrapper">
-                <h2 class="feature-title">All-Day Battery</h2>
-                <p class="feature-desc">Up to 30 hours of listening time. A 5-minute charge gives you 1 hour of playback.</p>
-            </div>
-        </section>
-
-    </div>
-
-    <!-- Final CTA Section -->
-    <div id="final-section">
-        <div class="final-content">
-            <h2 class="final-headline">AirSound Pro</h2>
-            <p class="final-subhead">Available now.</p>
-            <p class="price">Starting at $249 or $41.50/month for 6 months.</p>
-            <button class="cta-button" onclick="alert('Coming soon!')">Buy Now</button>
+            <p class="reveal-caption" id="reveal-caption">
+                <span class="highlight">Your workspace.</span> Built from the ground up.
+            </p>
         </div>
-    </div>
+    </section>
 
-    <script>
-        // Register GSAP plugins
-        gsap.registerPlugin(ScrollTrigger);
+    <!-- ============================================================
+         SCENE 3: COLLABORATION (Deep Zoom + Avatars)
+         ============================================================ -->
+    <section class="scene scene-collab" id="scene-collab">
+        <div class="scene-collab__sticky">
+            <div class="collab-viewport" id="collab-viewport">
+                <img src="assets/main-screen.svg" alt="Collaboration View" class="collab-img" id="collab-img">
 
-        // Configuration
-        const FRAME_COUNT = 120; // Total frames in sequence
-        const IMAGE_FORMAT = 'webp'; // Use webp for better compression
-        const IMAGE_PATH = 'https://www.apple.com/105/media/us/airpods-pro/2019/1299e2f5_9206_4470_b28e_08307a42f19b/anim/sequence/large/01-hero-lightpass/'; // Using Apple's public asset structure as example
-        
-        // Canvas setup
-        const canvas = document.getElementById('hero-canvas');
-        const ctx = canvas.getContext('2d');
-        const container = document.getElementById('canvas-container');
-        
-        // State
-        let images = [];
-        let currentFrame = 0;
-        let isLoading = true;
-        let loadedCount = 0;
-        
-        // Set canvas size
-        function resizeCanvas() {
-            const dpr = window.devicePixelRatio || 1;
-            const rect = container.getBoundingClientRect();
-            
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            
-            ctx.scale(dpr, dpr);
-            canvas.style.width = `${rect.width}px`;
-            canvas.style.height = `${rect.height}px`;
-            
-            // Redraw current frame if available
-            if (images[currentFrame] && images[currentFrame].complete) {
-                drawFrame(currentFrame);
-            }
-        }
+                <!-- Floating Avatars -->
+                <div class="collab-avatars" id="collab-avatars">
+                    <div class="collab-avatar av-1" id="av-1">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=128&h=128&fit=crop&crop=face"
+                            alt="User 1">
+                        <div class="avatar-ring"></div>
+                        <div class="avatar-cursor">
+                            <svg width="16" height="16" viewBox="0 0 16 16">
+                                <path d="M1 1l14 6-6 2-2 6z" fill="#4ca" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="collab-avatar av-2" id="av-2">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=128&h=128&fit=crop&crop=face"
+                            alt="User 2">
+                        <div class="avatar-ring"></div>
+                        <div class="avatar-cursor">
+                            <svg width="16" height="16" viewBox="0 0 16 16">
+                                <path d="M1 1l14 6-6 2-2 6z" fill="#c82" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="collab-avatar av-3" id="av-3">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=128&h=128&fit=crop&crop=face"
+                            alt="User 3">
+                        <div class="avatar-ring"></div>
+                        <div class="avatar-cursor">
+                            <svg width="16" height="16" viewBox="0 0 16 16">
+                                <path d="M1 1l14 6-6 2-2 6z" fill="#f0f" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="collab-caption" id="collab-caption">
+                Code together. <span class="highlight">In real time.</span>
+            </p>
+        </div>
+    </section>
 
-        // Draw specific frame
-        function drawFrame(index) {
-            if (!images[index] || !images[index].complete) return;
-            
-            const img = images[index];
-            const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
-            const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
-            
-            // Clear canvas
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-            
-            // Calculate cover fit
-            const scale = Math.max(canvasWidth / img.width, canvasHeight / img.height);
-            const x = (canvasWidth - img.width * scale) / 2;
-            const y = (canvasHeight - img.height * scale) / 2;
-            
-            // Draw image with smooth rendering
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-        }
+    <!-- ============================================================
+         SCENE 4: SAME PAGE (Branching Animation)
+         ============================================================ -->
+    <section class="scene scene-branch" id="scene-branch">
+        <div class="scene-branch__sticky">
+            <div class="branch-container" id="branch-container">
 
-        // Generate image URLs (simulating 3D rendered sequence)
-        // In production, these would be actual rendered frames from 3D software
-        function getImageUrl(index) {
-            // Pad index to 4 digits (0001, 0002, etc.)
-            const frameNum = (index + 1).toString().padStart(4, '0');
-            return `${IMAGE_PATH}${frameNum}.jpg`;
-        }
+                <!-- Main branch screen -->
+                <div class="branch-screen" id="branch-main">
+                    <img src="assets/main-screen.svg" alt="Main Branch" class="branch-img">
+                    <div class="branch-label-tag" id="branch-main-label">
+                        <svg class="branch-svg-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="6" y1="3" x2="6" y2="15"></line>
+                            <circle cx="18" cy="6" r="3"></circle>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <path d="M18 9a9 9 0 0 1-9 9"></path>
+                        </svg>
+                        Feature branch
+                    </div>
+                </div>
 
-        // Preload images with progress tracking
-        async function preloadImages() {
-            const promises = [];
-            
-            // Load images in chunks for better performance
-            const chunkSize = 10;
-            
-            for (let i = 0; i < FRAME_COUNT; i++) {
-                const promise = new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.crossOrigin = "anonymous";
-                    
-                    img.onload = () => {
-                        loadedCount++;
-                        updateLoader();
-                        resolve(img);
-                    };
-                    
-                    img.onerror = () => {
-                        // If image fails to load, create a placeholder
-                        console.warn(`Failed to load frame ${i}`);
-                        loadedCount++;
-                        updateLoader();
-                        resolve(createPlaceholderFrame(i));
-                    };
-                    
-                    // Try to load actual image, fallback to generated canvas
-                    img.src = getImageUrl(i);
-                });
-                
-                promises.push(promise);
-                
-                // Process in chunks to not block UI
-                if (i % chunkSize === 0) {
-                    await new Promise(resolve => setTimeout(resolve, 10));
-                }
-            }
-            
-            images = await Promise.all(promises);
-            isLoading = false;
-            hideLoader();
-            initScrollAnimation();
-        }
+                <!-- Feature branch screen (loading → reveal) -->
+                <div class="branch-screen" id="branch-feature">
+                    <img src="assets/loading-screen.svg" alt="Loading" class="branch-img" id="branch-loading-img">
+                    <img src="assets/main-screen.svg" alt="Feature Branch" class="branch-img branch-revealed"
+                        id="branch-revealed-img">
+                    <div class="branch-label-tag" id="branch-feature-label">
+                        <svg class="branch-svg-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="6" y1="3" x2="6" y2="15"></line>
+                            <circle cx="18" cy="6" r="3"></circle>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <path d="M18 9a9 9 0 0 1-9 9"></path>
+                        </svg>
+                        Frontend FYI's branch
+                    </div>
+                </div>
 
-        // Create placeholder frame if image fails (for demo purposes)
-        function createPlaceholderFrame(frameIndex) {
-            const placeholderCanvas = document.createElement('canvas');
-            placeholderCanvas.width = 1920;
-            placeholderCanvas.height = 1080;
-            const pCtx = placeholderCanvas.getContext('2d');
-            
-            // Create gradient background simulating 3D rotation
-            const rotation = (frameIndex / FRAME_COUNT) * Math.PI * 2;
-            const hue = 200 + Math.sin(rotation) * 20;
-            
-            const gradient = pCtx.createRadialGradient(
-                960 + Math.cos(rotation) * 200, 
-                540 + Math.sin(rotation) * 100, 
-                0,
-                960, 540, 1000
-            );
-            
-            gradient.addColorStop(0, `hsl(${hue}, 10%, 95%)`);
-            gradient.addColorStop(0.5, `hsl(${hue}, 5%, 90%)`);
-            gradient.addColorStop(1, `hsl(${hue}, 10%, 85%)`);
-            
-            pCtx.fillStyle = gradient;
-            pCtx.fillRect(0, 0, 1920, 1080);
-            
-            // Draw simplified AirPods representation
-            pCtx.save();
-            pCtx.translate(960, 540);
-            pCtx.rotate(rotation);
-            pCtx.scale(0.8 + Math.sin(rotation * 2) * 0.2, 0.8 + Math.sin(rotation * 2) * 0.2);
-            
-            // Case
-            pCtx.fillStyle = '#f5f5f7';
-            pCtx.shadowColor = 'rgba(0,0,0,0.2)';
-            pCtx.shadowBlur = 60;
-            pCtx.shadowOffsetY = 40;
-            
-            // Draw case with rounded rect
-            pCtx.beginPath();
-            pCtx.roundRect(-150, -200, 300, 400, 60);
-            pCtx.fill();
-            
-            // Lid (opens based on frame)
-            const openAmount = Math.max(0, (frameIndex - 30) / 60);
-            pCtx.save();
-            pCtx.translate(0, -200);
-            pCtx.rotate(-openAmount * Math.PI / 3);
-            pCtx.translate(0, 200);
-            
-            pCtx.fillStyle = '#e8e8ed';
-            pCtx.beginPath();
-            pCtx.roundRect(-150, -200, 300, 200, [60, 60, 0, 0]);
-            pCtx.fill();
-            pCtx.restore();
-            
-            // Earbuds (appear after lid opens)
-            if (frameIndex > 40) {
-                const earbudY = -50 - Math.min((frameIndex - 40) * 3, 100);
-                
-                // Left earbud
-                pCtx.fillStyle = '#ffffff';
-                pCtx.shadowBlur = 30;
-                pCtx.beginPath();
-                pCtx.ellipse(-80, earbudY, 40, 80, -0.2, 0, Math.PI * 2);
-                pCtx.fill();
-                
-                // Right earbud
-                pCtx.beginPath();
-                pCtx.ellipse(80, earbudY, 40, 80, 0.2, 0, Math.PI * 2);
-                pCtx.fill();
-            }
-            
-            pCtx.restore();
-            
-            const img = new Image();
-            img.src = placeholderCanvas.toDataURL();
-            return img;
-        }
+                <!-- Avatar indicator on main screen -->
+                <div class="branch-avatar" id="branch-avatar">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=face"
+                        alt="">
+                </div>
+            </div>
 
-        // Update loading progress
-        function updateLoader() {
-            const percent = Math.round((loadedCount / FRAME_COUNT) * 100);
-            document.getElementById('progressFill').style.width = `${percent}%`;
-            document.getElementById('progressText').textContent = `${percent}%`;
-        }
+            <!-- Text overlays -->
+            <div class="branch-text" id="branch-text-1">
+                Not only share code,<br><span class="highlight">share the context.</span>
+            </div>
+            <div class="branch-text" id="branch-text-2">
+                Sometimes it's not about code.<br><span class="highlight">Get everybody on the same page.</span>
+            </div>
+            <div class="branch-text branch-text--center" id="branch-text-3">
+                <span class="highlight">Built for flow.</span><br>
+                Spin up a new branch for any sized project in seconds.
+            </div>
+        </div>
+    </section>
 
-        // Hide loader
-        function hideLoader() {
-            const loader = document.getElementById('loader');
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-                // Show initial content
-                animateIn(document.querySelector('#sec1 .headline'));
-                animateIn(document.querySelector('#sec1 .subhead'), 0.2);
-            }, 500);
-        }
+    <!-- ============================================================
+         SCENE 5: FEATURES STACK (Image swap + text slides)
+         ============================================================ -->
+    <section class="scene scene-features" id="scene-features">
+        <div class="scene-features__sticky">
+            <div class="features-visual" id="features-visual">
+                <img src="assets/main-screen.svg" alt="Main Screen" class="features-layer" id="feat-layer-1">
+                <img src="assets/command-palette.svg" alt="Command Palette" class="features-layer" id="feat-layer-2">
+                <img src="assets/devtools.svg" alt="DevTools" class="features-layer" id="feat-layer-3">
+            </div>
 
-        // Helper to animate elements in
-        function animateIn(element, delay = 0) {
-            gsap.to(element, {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                delay: delay,
-                ease: "power3.out"
-            });
-        }
+            <!-- Text slides -->
+            <div class="features-text" id="feat-text-1">
+                <span class="highlight">Preconfigured environments</span><br>
+                We detect your environment so you don't need to fiddle with configuration files.
+            </div>
+            <div class="features-text" id="feat-text-2">
+                <span class="highlight">Command Palette</span><br>
+                Access and complete any action in seconds with the command palette.
+            </div>
+            <div class="features-text" id="feat-text-3">
+                <span class="highlight">DevTools</span><br>
+                We've bundled useful tools to help you get your work done faster.
+            </div>
+        </div>
+    </section>
 
-        // Main scroll animation setup
-        function initScrollAnimation() {
-            // Create GSAP timeline tied to scroll
-            const scrollTimeline = gsap.timeline({
-                scrollTrigger: {
-                    trigger: "#scroll-track",
-                    start: "top top",
-                    end: "bottom bottom",
-                    scrub: 0.5, // Smooth scrubbing
-                    pin: false,
-                    onUpdate: (self) => {
-                        // Calculate frame based on scroll progress
-                        const progress = self.progress;
-                        const frameIndex = Math.min(
-                            Math.floor(progress * (FRAME_COUNT - 1)),
-                            FRAME_COUNT - 1
-                        );
-                        
-                        if (frameIndex !== currentFrame) {
-                            currentFrame = frameIndex;
-                            requestAnimationFrame(() => drawFrame(currentFrame));
-                        }
-                        
-                        // Show final section at end
-                        if (progress > 0.9) {
-                            document.getElementById('final-section').classList.add('visible');
-                        } else {
-                            document.getElementById('final-section').classList.remove('visible');
-                        }
-                    }
-                }
-            });
+    <!-- ============================================================
+         SCENE 6: STREAMLINED EXPERIENCE (Horizontal text + crop)
+         ============================================================ -->
+    <section class="scene scene-stream" id="scene-stream">
+        <div class="scene-stream__sticky">
+            <div class="stream-box" id="stream-box">
+                <p class="stream-giant-text" id="stream-text-1">Streamlined Experience.</p>
+                <p class="stream-giant-text stream-outline" id="stream-text-2">Streamlined Experience.</p>
 
-            // Content section animations
-            setupContentAnimations();
-        }
+                <div class="stream-center-text" id="stream-center">
+                    <h2>Streamlined<br>Experience.</h2>
+                </div>
 
-        // Setup content reveal animations
-        function setupContentAnimations() {
-            // Section 1: Hero fade out
-            gsap.to("#sec1 .headline", {
-                scrollTrigger: {
-                    trigger: "#sec1",
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: true
-                },
-                opacity: 0,
-                y: -100,
-                ease: "none"
-            });
-            
-            gsap.to("#sec1 .subhead", {
-                scrollTrigger: {
-                    trigger: "#sec1",
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: true
-                },
-                opacity: 0,
-                y: -50,
-                ease: "none"
-            });
-            
-            gsap.to("#scrollHint", {
-                scrollTrigger: {
-                    trigger: "#sec1",
-                    start: "10% top",
-                    end: "50% top",
-                    scrub: true
-                },
-                opacity: 0,
-                ease: "none"
-            });
+                <!-- Neon border -->
+                <div class="stream-border" id="stream-border"></div>
+                <!-- Right mask -->
+                <div class="stream-mask-right" id="stream-mask-right"></div>
+                <div class="stream-border-right" id="stream-border-right"></div>
+            </div>
+        </div>
+    </section>
 
-            // Section 2: Spatial Audio
-            gsap.to("#sec2", {
-                scrollTrigger: {
-                    trigger: "#sec2",
-                    start: "top 80%",
-                    end: "top 30%",
-                    scrub: true
-                },
-                opacity: 1,
-                ease: "none"
-            });
-            
-            gsap.to("#sec2 .feature-title", {
-                scrollTrigger: {
-                    trigger: "#sec2",
-                    start: "top 70%",
-                    end: "top 40%",
-                    scrub: true
-                },
-                opacity: 1,
-                y: 0,
-                ease: "none"
-            });
-            
-            gsap.to("#sec2 .feature-desc", {
-                scrollTrigger: {
-                    trigger: "#sec2",
-                    start: "top 60%",
-                    end: "top 30%",
-                    scrub: true
-                },
-                opacity: 1,
-                y: 0,
-                ease: "none"
-            });
-            
-            // Fade out section 2
-            gsap.to("#sec2", {
-                scrollTrigger: {
-                    trigger: "#sec2",
-                    start: "bottom 80%",
-                    end: "bottom top",
-                    scrub: true
-                },
-                opacity: 0,
-                ease: "none"
-            });
+    <!-- ============================================================
+         SCENE 7: FINALE (Composite zoom out)
+         ============================================================ -->
+    <section class="scene scene-finale" id="scene-finale">
+        <div class="scene-finale__sticky">
+            <div class="finale-grid" id="finale-grid">
+                <div class="finale-card" id="fin-1">
+                    <img src="assets/main-screen.svg" alt="">
+                    <span>Sandbox</span>
+                </div>
+                <div class="finale-card" id="fin-2">
+                    <img src="assets/command-palette.svg" alt="">
+                    <span>Palette</span>
+                </div>
+                <div class="finale-card" id="fin-3">
+                    <img src="assets/devtools.svg" alt="">
+                    <span>DevTools</span>
+                </div>
+                <div class="finale-card" id="fin-4">
+                    <img src="assets/loading-screen.svg" alt="">
+                    <span>Branches</span>
+                </div>
+            </div>
+            <h2 class="finale-title" id="finale-title">The future of development.</h2>
+            <p class="finale-sub" id="finale-sub">Start building today.</p>
 
-            // Section 3: Noise Cancellation
-            gsap.to("#sec3", {
-                scrollTrigger: {
-                    trigger: "#sec3",
-                    start: "top 80%",
-                    end: "top 30%",
-                    scrub: true
-                },
-                opacity: 1,
-                ease: "none"
-            });
-            
-            gsap.to("#sec3 .feature-title", {
-                scrollTrigger: {
-                    trigger: "#sec3",
-                    start: "top 70%",
-                    end: "top 40%",
-                    scrub: true
-                },
-                opacity: 1,
-                y: 0,
-                ease: "none"
-            });
-            
-            gsap.to("#sec3 .feature-desc", {
-                scrollTrigger: {
-                    trigger: "#sec3",
-                    start: "top 60%",
-                    end: "top 30%",
-                    scrub: true
-                },
-                opacity: 1,
-                y: 0,
-                ease: "none"
-            });
-            
-            gsap.to("#sec3", {
-                scrollTrigger: {
-                    trigger: "#sec3",
-                    start: "bottom 80%",
-                    end: "bottom top",
-                    scrub: true
-                },
-                opacity: 0,
-                ease: "none"
-            });
+            <footer class="footer">
+                <p>Built for WebX Task 03</p>
+            </footer>
+        </div>
+    </section>
 
-            // Section 4: Battery
-            gsap.to("#sec4", {
-                scrollTrigger: {
-                    trigger: "#sec4",
-                    start: "top 80%",
-                    end: "top 30%",
-                    scrub: true
-                },
-                opacity: 1,
-                ease: "none"
-            });
-            
-            gsap.to("#sec4 .feature-title", {
-                scrollTrigger: {
-                    trigger: "#sec4",
-                    start: "top 70%",
-                    end: "top 40%",
-                    scrub: true
-                },
-                opacity: 1,
-                y: 0,
-                ease: "none"
-            });
-            
-            gsap.to("#sec4 .feature-desc", {
-                scrollTrigger: {
-                    trigger: "#sec4",
-                    start: "top 60%",
-                    end: "top 30%",
-                    scrub: true
-                },
-                opacity: 1,
-                y: 0,
-                ease: "none"
-            });
-            
-            gsap.to("#sec4", {
-                scrollTrigger: {
-                    trigger: "#sec4",
-                    start: "bottom 80%",
-                    end: "bottom top",
-                    scrub: true
-                },
-                opacity: 0,
-                ease: "none"
-            });
-        }
-
-        // Initialize
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('load', () => {
-            resizeCanvas();
-            preloadImages();
-        });
-
-        // Initial resize
-        resizeCanvas();
-
-        // Smooth scroll behavior for any anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
+
 </html>
