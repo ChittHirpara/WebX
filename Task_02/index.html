@@ -1,51 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebXperience Challenge</title>
-    
-    <!-- Google Fonts: Inter & Outfit -->
+    <title>IRONCORE — Premium Gym Gear</title>
+    <meta name="description" content="Shop premium gym equipment, supplements, and fitness accessories at IRONCORE.">
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- CSS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
-    
-    <!-- GSAP (GreenSock) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    
-    <!-- Lenis (Smooth Scroll) -->
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 </head>
+
 <body>
 
-    <main class="app-container">
-        <!-- Hackathon Content Goes Here -->
-        <header>
-            <nav class="navbar">
-                <div class="logo">WebXperience</div>
-                <div class="menu">
-                    <a href="#">Home</a>
-                    <a href="#">About</a>
-                    <a href="#">Work</a>
-                </div>
+    <!-- ========== HEADER ========== -->
+    <header class="header" id="header">
+        <div class="header__inner">
+            <a href="#" class="header__brand">
+                <span class="header__logo">⚡</span>
+                <span class="header__name">IRON<span class="accent">CORE</span></span>
+            </a>
+            <nav class="header__nav">
+                <a href="#catalog" class="header__link">Shop</a>
+                <a href="#" class="header__link">About</a>
+                <button class="header__cart" id="cartBtn" aria-label="Cart">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1" />
+                        <circle cx="20" cy="21" r="1" />
+                        <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+                    </svg>
+                    <span class="header__cart-count" id="cartCount">0</span>
+                </button>
             </nav>
-        </header>
+        </div>
+    </header>
 
-        <section class="hero">
-            <h1 class="hero-title">Create. Build. <span class="highlight">Animate.</span></h1>
-            <p class="hero-subtitle">Ready for the challenge.</p>
-        </section>
+    <!-- ========== HERO ========== -->
+    <section class="hero">
+        <div class="hero__bg">
+            <div class="hero__orb hero__orb--1"></div>
+            <div class="hero__orb hero__orb--2"></div>
+            <div class="hero__orb hero__orb--3"></div>
+        </div>
+        <div class="hero__content">
+            <span class="hero__badge">🏋️ New Collection 2026</span>
+            <h1 class="hero__title">Upgrade Your<br><span class="hero__glow">Fitness Gear</span></h1>
+            <p class="hero__sub">Premium equipment & supplements engineered for peak performance.</p>
+            <a href="#catalog" class="hero__cta">
+                Shop Now
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+    </section>
 
-        <!-- Placeholder for prompt-specific content -->
-        <div id="content-area"></div>
-        
-    </main>
+    <!-- ========== CATALOG ========== -->
+    <section class="catalog" id="catalog">
+        <div class="catalog__header">
+            <span class="catalog__badge">Our Products</span>
+            <h2 class="catalog__title">Built for <span class="accent">Champions</span></h2>
+            <p class="catalog__sub">Handpicked fitness essentials to fuel your journey.</p>
+        </div>
 
-    <!-- JS -->
+        <div class="catalog__grid">
+
+            <!-- Product 1 -->
+            <article class="card" data-reveal>
+                <div class="card__img-wrap">
+                    <img class="card__img"
+                        src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&h=500&fit=crop&q=80"
+                        alt="Hex Dumbbells" loading="lazy">
+                    <span class="card__tag">Bestseller</span>
+                </div>
+                <div class="card__body">
+                    <h3 class="card__name">Hex Dumbbells</h3>
+                    <p class="card__desc">Rubber-coated, anti-roll design. 5–50 lbs.</p>
+                    <div class="card__footer">
+                        <span class="card__price">$49.99</span>
+                        <button class="card__btn" aria-label="Add to Cart">
+                            <span class="card__btn-text">Add to Cart</span>
+                            <span class="card__btn-icon">+</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 2 -->
+            <article class="card" data-reveal>
+                <div class="card__img-wrap">
+                    <img class="card__img"
+                        src="https://images.unsplash.com/photo-1593095948071-474c5cc2c2d8?w=500&h=500&fit=crop&q=80"
+                        alt="Whey Protein" loading="lazy">
+                    <span class="card__tag">Popular</span>
+                </div>
+                <div class="card__body">
+                    <h3 class="card__name">Whey Protein Isolate</h3>
+                    <p class="card__desc">25g protein per scoop. Chocolate flavor.</p>
+                    <div class="card__footer">
+                        <span class="card__price">$39.99</span>
+                        <button class="card__btn" aria-label="Add to Cart">
+                            <span class="card__btn-text">Add to Cart</span>
+                            <span class="card__btn-icon">+</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 3 -->
+            <article class="card" data-reveal>
+                <div class="card__img-wrap">
+                    <img class="card__img"
+                        src="https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?w=500&h=500&fit=crop&q=80"
+                        alt="Yoga Mat" loading="lazy">
+                </div>
+                <div class="card__body">
+                    <h3 class="card__name">Premium Yoga Mat</h3>
+                    <p class="card__desc">Non-slip TPE, 6mm thick. Eco-friendly.</p>
+                    <div class="card__footer">
+                        <span class="card__price">$29.99</span>
+                        <button class="card__btn" aria-label="Add to Cart">
+                            <span class="card__btn-text">Add to Cart</span>
+                            <span class="card__btn-icon">+</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 4 -->
+            <article class="card" data-reveal>
+                <div class="card__img-wrap">
+                    <img class="card__img"
+                        src="https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=500&h=500&fit=crop&q=80"
+                        alt="Resistance Bands" loading="lazy">
+                    <span class="card__tag">New</span>
+                </div>
+                <div class="card__body">
+                    <h3 class="card__name">Resistance Band Set</h3>
+                    <p class="card__desc">5 levels, portable, latex-free fabric.</p>
+                    <div class="card__footer">
+                        <span class="card__price">$24.99</span>
+                        <button class="card__btn" aria-label="Add to Cart">
+                            <span class="card__btn-text">Add to Cart</span>
+                            <span class="card__btn-icon">+</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 5 -->
+            <article class="card" data-reveal>
+                <div class="card__img-wrap">
+                    <img class="card__img"
+                        src="https://images.unsplash.com/photo-1623874514711-0f321325f318?w=500&h=500&fit=crop&q=80"
+                        alt="Shaker Bottle" loading="lazy">
+                </div>
+                <div class="card__body">
+                    <h3 class="card__name">Pro Shaker Bottle</h3>
+                    <p class="card__desc">800ml, leak-proof, BPA-free with mixer ball.</p>
+                    <div class="card__footer">
+                        <span class="card__price">$14.99</span>
+                        <button class="card__btn" aria-label="Add to Cart">
+                            <span class="card__btn-text">Add to Cart</span>
+                            <span class="card__btn-icon">+</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 6 -->
+            <article class="card" data-reveal>
+                <div class="card__img-wrap">
+                    <img class="card__img"
+                        src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=500&h=500&fit=crop&q=80"
+                        alt="Kettlebell" loading="lazy">
+                    <span class="card__tag">Hot</span>
+                </div>
+                <div class="card__body">
+                    <h3 class="card__name">Cast Iron Kettlebell</h3>
+                    <p class="card__desc">Powder-coated grip. 10–40 kg range.</p>
+                    <div class="card__footer">
+                        <span class="card__price">$44.99</span>
+                        <button class="card__btn" aria-label="Add to Cart">
+                            <span class="card__btn-text">Add to Cart</span>
+                            <span class="card__btn-icon">+</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 7 -->
+            <article class="card" data-reveal>
+                <div class="card__img-wrap">
+                    <img class="card__img"
+                        src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&h=500&fit=crop&q=80"
+                        alt="Gym Gloves" loading="lazy">
+                </div>
+                <div class="card__body">
+                    <h3 class="card__name">Training Gloves</h3>
+                    <p class="card__desc">Padded palm, wrist support. Breathable mesh.</p>
+                    <div class="card__footer">
+                        <span class="card__price">$19.99</span>
+                        <button class="card__btn" aria-label="Add to Cart">
+                            <span class="card__btn-text">Add to Cart</span>
+                            <span class="card__btn-icon">+</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Product 8 -->
+            <article class="card" data-reveal>
+                <div class="card__img-wrap">
+                    <img class="card__img"
+                        src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=500&fit=crop&q=80"
+                        alt="Jump Rope" loading="lazy">
+                    <span class="card__tag">Sale</span>
+                </div>
+                <div class="card__body">
+                    <h3 class="card__name">Speed Jump Rope</h3>
+                    <p class="card__desc">Adjustable steel cable. Ball-bearing handles.</p>
+                    <div class="card__footer">
+                        <span class="card__price">$12.99</span>
+                        <button class="card__btn" aria-label="Add to Cart">
+                            <span class="card__btn-text">Add to Cart</span>
+                            <span class="card__btn-icon">+</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="footer__inner">
+            <span class="footer__brand">⚡ IRON<span class="accent">CORE</span></span>
+            <p class="footer__copy">© 2026 IRONCORE. Built for WebXperience.</p>
+        </div>
+    </footer>
+
+    <!-- ========== TOAST ========== -->
+    <div class="toast" id="toast">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span id="toastText">Added to cart!</span>
+    </div>
+
+    <!-- JavaScript -->
     <script src="script.js"></script>
+
 </body>
+
 </html>
