@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Card Reveal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .card {
+            width: 800px;
+            height: 500px;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Background layers */
+        .layer {
+            position: absolute;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Dark base */
+        .bg-dark {
+            inset: 0;
+            background: #1a1a2e;
+            z-index: 1;
+        }
+
+        /* Pink/Purple gradient triangle (top) */
+        .triangle-pink {
+            top: -50%;
+            left: -20%;
+            width: 150%;
+            height: 100%;
+            background: linear-gradient(135deg, #ffb7b2 0%, #d4a5a5 25%, #c084fc 60%, #a855f7 100%);
+            transform: rotate(-15deg) skewY(10deg);
+            z-index: 2;
+            opacity: 0.95;
+        }
+
+        /* Green triangle (right) */
+        .triangle-green {
+            top: 20%;
+            right: -30%;
+            width: 80%;
+            height: 120%;
+            background: #7c9885;
+            transform: rotate(25deg) skewY(-15deg);
+            z-index: 3;
+            opacity: 0.9;
+        }
+
+        /* Dark green triangle (bottom) */
+        .triangle-dark-green {
+            bottom: -40%;
+            left: -10%;
+            width: 120%;
+            height: 80%;
+            background: #1a2f23;
+            transform: rotate(-10deg) skewY(5deg);
+            z-index: 4;
+        }
+
+        /* Content */
+        .content {
+            position: relative;
+            z-index: 10;
+            padding: 3rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            transition: all 0.4s ease;
+        }
+
+        .title {
+            font-size: 10rem;
+            font-weight: 800;
+            color: white;
+            line-height: 0.9;
+            letter-spacing: -0.05em;
+            transition: all 0.4s ease;
+        }
+
+        /* Revealed images container */
+        .revealed-images {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            opacity: 0;
+            transform: scale(1.05);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 4px;
+            background: #0a0a0a;
+        }
+
+        .revealed-images .img-box {
+            position: relative;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+
+        .revealed-images img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Hover states */
+        .card:hover .triangle-pink {
+            transform: rotate(-15deg) skewY(10deg) translateY(-120%);
+            opacity: 0;
+        }
+
+        .card:hover .triangle-green {
+            transform: rotate(25deg) skewY(-15deg) translateX(120%);
+            opacity: 0;
+        }
+
+        .card:hover .triangle-dark-green {
+            transform: rotate(-10deg) skewY(5deg) translateY(120%);
+            opacity: 0;
+        }
+
+        .card:hover .label {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .card:hover .title {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .card:hover .revealed-images {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .card:hover .revealed-images img {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .card:hover .revealed-images .img-box:nth-child(1) img { transition-delay: 0.1s; }
+        .card:hover .revealed-images .img-box:nth-child(2) img { transition-delay: 0.18s; }
+        .card:hover .revealed-images .img-box:nth-child(3) img { transition-delay: 0.26s; }
+        .card:hover .revealed-images .img-box:nth-child(4) img { transition-delay: 0.34s; }
+
+        /* Hover hint */
+        .hover-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .hover-hint {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .card {
+                width: 90vw;
+                height: 56vw;
+            }
+            .title { font-size: 15vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="projectCard">
+        <!-- Revealed Images Grid -->
+        <div class="revealed-images">
+            <div class="img-box">
+                <img id="img1" alt="Feature branch comparison">
+            </div>
+            <div class="img-box">
+                <img id="img2" alt="Frontend FYI's branch">
+            </div>
+            <div class="img-box">
+                <img id="img3" alt="Code editor view">
+            </div>
+            <div class="img-box">
+                <img id="img4" alt="Project preview">
+            </div>
+        </div>
+
+        <!-- Dark base -->
+        <div class="layer bg-dark"></div>
+
+        <!-- Geometric triangles -->
+        <div class="layer triangle-pink"></div>
+        <div class="layer triangle-green"></div>
+        <div class="layer triangle-dark-green"></div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="label">Projects</div>
+            <h1 class="title">DE</h1>
+        </div>
+
+        <!-- Hover hint -->
+        <div class="hover-hint">
+            <span>Hover to view</span>
+            →
+        </div>
+    </div>
+
+    <script>
+        // Image data - Base64 encoded placeholders that look like the screenshots
+        // Since I can't read the actual files, I'll create canvas-based representations
+        // or use data URIs. Let me try to fetch them first, then fallback to canvas renderings
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function createCodeEditorImage(width, height, type) {
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Dark background
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Sidebar
+            ctx.fillStyle = '#161b22';
+            ctx.fillRect(0, 0, 60, height);
+            
+            // File tree items
+            ctx.fillStyle = '#8b949e';
+            for(let i = 0; i < 15; i++) {
+                ctx.fillRect(70, 30 + i * 25, 100, 12);
+            }
+            
+            // Code area background
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(200, 0, width - 200, height);
+            
+            // Code lines
+            ctx.fillStyle = '#58a6ff';
+            for(let i = 0; i < 20; i++) {
+                const lineWidth = Math.random() * 300 + 100;
+                ctx.fillRect(220, 40 + i * 22, lineWidth, 10);
+            }
+            
+            // Preview panel on right (for some types)
+            if (type === 'preview' || type === 'split') {
+                const previewX = width * 0.55;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(previewX, 40, width - previewX - 20, height - 80);
+                
+                // Plant drawings
+                ctx.fillStyle = '#2ea043';
+                ctx.beginPath();
+                ctx.arc(previewX + 50, 100, 30, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#f0883e';
+                ctx.beginPath();
+                ctx.arc(previewX + 150, 150, 25, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Branch label at bottom
+            if (type === 'feature') {
+                ctx.fillStyle = '#21262d';
+                ctx.fillRect(0, height - 50, width, 50);
+                ctx.fillStyle = '#8b949e';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('🔗 Feature branch', 20, height - 20);
+            } else if (type === 'frontend') {
+                ctx.fillStyle = '#21262d';
+                ctx.fillRect(0, height - 50, width, 50);
+                ctx.fillStyle = '#8b949e';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('🔗 Frontend FYI\'s branch', 20, height - 20);
+            }
+            
+            return canvas.toDataURL();
+        }
+        
+        // Generate images
+        const img1 = document.getElementById('img1');
+        const img2 = document.getElementById('img2');
+        const img3 = document.getElementById('img3');
+        const img4 = document.getElementById('img4');
+        
+        img1.src = createCodeEditorImage(400, 250, 'feature');
+        img2.src = createCodeEditorImage(400, 250, 'frontend');
+        img3.src = createCodeEditorImage(400, 250, 'split');
+        img4.src = createCodeEditorImage(400, 250, 'preview');
+        
+        // Try to load actual files if possible (for when this runs in the correct environment)
+        async function tryLoadActualImages() {
+            const files = [
+                '/mnt/kimi/upload/image(1).png',
+                '/mnt/kimi/upload/image(2).png', 
+                '/mnt/kimi/upload/image(3).png',
+                '/mnt/kimi/upload/image(4).png'
+            ];
+            
+            const images = [img1, img2, img3, img4];
+            
+            for (let i = 0; i < files.length; i++) {
+                try {
+                    const response = await fetch(files[i]);
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        images[i].src = url;
+                    }
+                } catch (e) {
+                    // Keep canvas generated image
+                }
+            }
+        }
+        
+        tryLoadActualImages();
+        
+        // Click to expand
+        [img1, img2, img3, img4].forEach(img => {
+            img.parentElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(0,0,0,0.95);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                `;
+                
+                const fullImg = document.createElement('img');
+                fullImg.src = img.src;
+                fullImg.style.cssText = `
+                    max-width: 95vw;
+                    max-height: 95vh;
+                    object-fit: contain;
+                    border-radius: 8px;
+                `;
+                
+                modal.appendChild(fullImg);
+                document.body.appendChild(modal);
+                requestAnimationFrame(() => modal.style.opacity = '1');
+                
+                modal.addEventListener('click', () => {
+                    modal.style.opacity = '0';
+                    setTimeout(() => modal.remove(), 300);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
