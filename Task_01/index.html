@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumière — Interactive Image Showcase</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader__ring"></div>
+        <div class="loader__txt">Loading</div>
+    </div>
+
+    <!-- Background -->
+    <div class="bg-orbs"><span></span><span></span><span></span></div>
+    <div class="grain"></div>
+    <div class="cur" id="cur"></div>
+
+    <!-- Full-screen Pop-out Overlay -->
+    <div class="pop" id="pop">
+        <button class="pop__x" id="popX" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+        <img class="pop__img" id="popImg" src="" alt="">
+        <div class="pop__meta">
+            <div class="pop__title" id="popT"></div>
+            <div class="pop__desc" id="popD"></div>
+        </div>
+    </div>
+
+    <!-- Page -->
+    <main class="page">
+
+        <header class="header" id="hdr">
+            <div class="header__badge">Interactive Gallery</div>
+            <h1 class="header__title">Lumière</h1>
+            <p class="header__sub">Four colors. Four secrets. Hover to uncover what lies beneath.</p>
+        </header>
+
+        <!--
+            DEFAULT: 4 solid color blocks (purple, teal, pink, gold)
+            HOVER: Color slides away, image pops out with glow
+        -->
+        <div class="mosaic" id="mosaic">
+            <div class="mosaic__grid">
+
+                <!-- Cell 1: Purple → Ocean -->
+                <div class="cell" data-t="Deep Blue" data-d="Ocean waves at golden hour"
+                    data-hi="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1400&h=1000&fit=crop&q=85">
+                    <img class="cell__img"
+                        src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=600&h=600&fit=crop&q=80"
+                        alt="Ocean" loading="eager">
+                    <div class="cell__color"><span class="cell__icon">🌊</span></div>
+                    <div class="cell__overlay"></div>
+                    <div class="cell__label">Deep Blue<span>Ocean</span></div>
+                    <div class="cell__num">01</div>
+                </div>
+
+                <!-- Cell 2: Teal → Forest -->
+                <div class="cell" data-t="Verdant" data-d="Sunlight through the canopy"
+                    data-hi="https://images.unsplash.com/photo-1448375240586-882707db888b?w=1400&h=1000&fit=crop&q=85">
+                    <img class="cell__img"
+                        src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&h=600&fit=crop&q=80"
+                        alt="Forest" loading="eager">
+                    <div class="cell__color"><span class="cell__icon">🌿</span></div>
+                    <div class="cell__overlay"></div>
+                    <div class="cell__label">Verdant<span>Forest</span></div>
+                    <div class="cell__num">02</div>
+                </div>
+
+                <!-- Cell 3: Pink → City -->
+                <div class="cell" data-t="Neon Nights" data-d="City skyline alive with light"
+                    data-hi="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1400&h=1000&fit=crop&q=85">
+                    <img class="cell__img"
+                        src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=600&h=600&fit=crop&q=80"
+                        alt="City" loading="eager">
+                    <div class="cell__color"><span class="cell__icon">🌃</span></div>
+                    <div class="cell__overlay"></div>
+                    <div class="cell__label">Neon Nights<span>City</span></div>
+                    <div class="cell__num">03</div>
+                </div>
+
+                <!-- Cell 4: Gold → Desert -->
+                <div class="cell" data-t="Terra" data-d="Golden dunes at sunset"
+                    data-hi="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1400&h=1000&fit=crop&q=85">
+                    <img class="cell__img"
+                        src="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&h=600&fit=crop&q=80"
+                        alt="Desert" loading="eager">
+                    <div class="cell__color"><span class="cell__icon">🏜️</span></div>
+                    <div class="cell__overlay"></div>
+                    <div class="cell__label">Terra<span>Desert</span></div>
+                    <div class="cell__num">04</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="hint" id="hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+            Hover to reveal · Click to expand
+        </div>
+
+        <footer class="footer" id="ftr">
+            Built with ♥ — <a href="#">WebXperience 2026</a>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
